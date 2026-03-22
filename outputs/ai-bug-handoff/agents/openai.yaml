@@ -1,0 +1,6 @@
+﻿interface:
+  display_name: "AI Bug Handoff"
+  short_description: "约束 bug 输出并确保任何 AI 可直接接单修复"
+  default_prompt: "Use $ai-bug-handoff to produce accurate, evidence-backed bug tasks with precise code-location and change-scope guidance."
+policy:
+  allow_implicit_invocation: true

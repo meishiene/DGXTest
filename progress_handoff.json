@@ -1,0 +1,67 @@
+﻿{
+  "project_name": "DGX Web Auto Test Framework",
+  "workspace": "D:\\work\\xkool\\DGXTest",
+  "handoff_doc": "D:\\work\\xkool\\DGXTest\\progress_handoff.md",
+  "handoff_json": "D:\\work\\xkool\\DGXTest\\progress_handoff.json",
+  "agent_doc": "D:\\work\\xkool\\DGXTest\\agent.md",
+  "architecture_doc": "D:\\work\\xkool\\DGXTest\\web_test_automation_architecture_master.md",
+  "implementation_checklist": "D:\\work\\xkool\\DGXTest\\development_implementation_checklist.md",
+  "current_stage": "Runnable skeleton finished; Excel templates and parser finished; step-driven runner connected; AI bug handoff contract integrated.",
+  "tech_stack": {
+    "language": "Python 3.10",
+    "automation": "Playwright",
+    "excel": "openpyxl",
+    "tests": "pytest"
+  },
+  "latest_verified_output_dir": "D:\\work\\xkool\\DGXTest\\outputs\\2026-03-20_152042_RUN_20260320_152042",
+  "latest_verified_commands": [
+    "python -m compileall src",
+    "python -m pytest -q tests\\test_excel_parser.py tests\\test_execution_support.py tests\\test_ai_bug_handoff_output.py",
+    "python -m src.main --config configs/run_config.json --dry-run"
+  ],
+  "key_files": {
+    "entry": "src/main.py",
+    "app": "src/core/app.py",
+    "runner": "src/runner/playwright_runner.py",
+    "report_generator": "src/reports/report_generator.py",
+    "excel_parser": "src/parser/excel_parser.py",
+    "excel_validator": "src/validator/excel_validator.py",
+    "template_generator": "src/parser/template_generator.py",
+    "object_resolver": "src/objects/resolver.py",
+    "action_executor": "src/actions/executor.py",
+    "assert_executor": "src/asserts/executor.py"
+  },
+  "available_templates": {
+    "test_workbook": "excels/test_suite_template.xlsx",
+    "object_repository": "object_repo/object_repository_template.xlsx"
+  },
+  "ai_bug_skill": {
+    "skill_dir": "outputs/ai-bug-handoff",
+    "skill_file": "outputs/ai-bug-handoff/SKILL.md",
+    "contract": "outputs/ai-bug-handoff/references/output-contract.md",
+    "template": "outputs/ai-bug-handoff/references/bug-task-template.md"
+  },
+  "known_limits": [
+    "Live runner currently supports only a small subset of action_key and assert_key.",
+    "dry-run is still the most stable demonstration path.",
+    "The real login flow is not yet connected to a local demo page or a real test environment.",
+    "bug_list.xlsx is not yet fully aligned with the ai-bug-handoff contract."
+  ],
+  "next_priorities": [
+    "P1: Add a local demo login page or connect a real test environment so the Playwright live path can run end-to-end.",
+    "P2: Expand action and assert executor coverage.",
+    "P3: Upgrade bug_list.xlsx to align with the same handoff contract used by AI bug docs.",
+    "P4: Improve bug deduplication, normalization, and primary-case selection."
+  ],
+  "resume_steps": [
+    "Read progress_handoff.md first.",
+    "Read agent.md next.",
+    "Run tests and dry-run commands to confirm current state.",
+    "Continue from P1 in next_priorities by default."
+  ],
+  "encoding_policy": {
+    "markdown": "utf-8-sig",
+    "ai_bug_docs": "utf-8-sig",
+    "handoff_json": "utf-8-sig"
+  }
+}

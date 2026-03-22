@@ -1,0 +1,20 @@
+﻿{
+  "project_name": "DGX Web Auto Test",
+  "suite_name": "dgx_demo_live_smoke",
+  "trigger_by": "local_user",
+  "base_url": "https://dgx.xlook.ai",
+  "browser": "chromium",
+  "headless": true,
+  "dry_run": false,
+  "demo_failure": false,
+  "output_root": "outputs",
+  "capture_screenshot": true,
+  "capture_dom_snapshot": true,
+  "capture_console_log": true,
+  "capture_network_log": false,
+  "capture_video": false,
+  "generate_bug_report": true,
+  "generate_ai_bug_doc": true,
+  "timeout_ms": 10000,
+  "run_id": ""
+}

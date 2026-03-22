@@ -1,0 +1,72 @@
+﻿# Bug ????
+
+????????? AI ????? bug ???
+
+## ????
+- bug_id:
+- title:
+- run_id:
+- case_id:
+- case_name:
+- module:
+- sub_module:
+- severity:
+- priority:
+- suspected_layer:
+
+## ????
+- ????? bug:
+- ????:
+- ??????:
+
+## ????
+1. 
+2. 
+3. 
+
+## ????
+- page_name:
+- page_url:
+- failed_step_no:
+- failed_step_name:
+- target:
+- locator_type:
+- locator_value:
+
+## ?????
+- expected_result:
+- actual_result:
+- failure_category:
+- failure_message:
+
+## ????
+- screenshot:
+- dom_snapshot:
+- console_log:
+- network_log:
+- video:
+
+## ????
+- suspected_files:
+- component_hint:
+- api_hint:
+- root_cause_hypothesis:
+
+## ??????
+- first_check:
+- second_check:
+- third_check:
+
+## ????
+- change_scope:
+- do_not_change:
+
+## ????
+1. 
+2. 
+3. 
+
+## ????
+- done_definition_1:
+- done_definition_2:
+- done_definition_3:
