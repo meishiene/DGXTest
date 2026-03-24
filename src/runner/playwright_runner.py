@@ -27,6 +27,7 @@ from src.utils.data_resolver import DataResolver
 
 PLACEHOLDER_ASSERTION_ACTUAL = "Assertion placeholder left empty in Excel"
 NETWORK_ASSERT_KEYS = frozenset({"assert_api_called", "assert_api_status"})
+HEADED_CHROMIUM_LAUNCH_ARGS = ("--start-maximized",)
 
 
 @dataclass(slots=True, frozen=True)
@@ -211,8 +212,8 @@ def _execute_live_run(
 
     with sync_playwright() as playwright:
         browser_factory = getattr(playwright, config.browser)
-        browser = browser_factory.launch(headless=config.headless)
-        page = browser.new_page()
+        browser = _launch_browser(browser_factory, config)
+        page = _create_browser_page(browser, config)
         runtime_evidence = PlaywrightRuntimeEvidence(
             capture_console_log=config.capture_console_log,
             capture_network_log=config.capture_network_log or _suite_requires_network_evidence(suite),
@@ -293,6 +294,33 @@ def _execute_live_run(
         summary,
         environment=run_settings.target_env or "local",
     ), case_results, step_results, artifacts
+
+
+def _launch_browser(browser_factory, config: AppConfig):
+    launch_options: dict[str, object] = {"headless": config.headless}
+    if not config.headless and config.browser == "chromium":
+        launch_options["args"] = list(HEADED_CHROMIUM_LAUNCH_ARGS)
+    return browser_factory.launch(**launch_options)
+
+
+def _create_browser_page(browser, config: AppConfig):
+    page_options: dict[str, object] = {}
+    if not config.headless:
+        page_options["no_viewport"] = True
+
+    page = browser.new_page(**page_options)
+    if not config.headless:
+        _try_resize_window_to_screen(page)
+    return page
+
+
+def _try_resize_window_to_screen(page) -> None:
+    try:
+        page.evaluate(
+            "() => { if (typeof window !== 'undefined' && window.screen) { window.moveTo(0, 0); window.resizeTo(window.screen.availWidth, window.screen.availHeight); } }"
+        )
+    except Exception:
+        return
 
 
 def _execute_live_case_attempt(

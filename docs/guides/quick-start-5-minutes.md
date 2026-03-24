@@ -139,6 +139,12 @@ python -m src.main --config configs/dgx_demo_complete_example_cn.dryrun.json --d
 python -m src.main --config configs/live_run_config.example.json
 ```
 
+如果你想缩短命令，也可以直接在仓库根目录执行：
+
+```powershell
+.\run.ps1
+```
+
 ## 5. 跑完后去哪里看
 
 每次执行都会在 [outputs](/D:/work/xkool/DGXTest/outputs) 下生成一个新的运行目录。

@@ -44,6 +44,18 @@ python -m src.main --config configs/run_config.json --dry-run
 python -m src.main --config configs/live_run_config.example.json
 ```
 
+也可以直接用根目录脚本缩短命令：
+
+```powershell
+.\run.ps1
+```
+
+如果要切回 dry-run 或指定其他配置，也可以这样用：
+
+```powershell
+.\run.ps1 -Config configs/run_config.json -DryRun
+```
+
 ### 5. 运行正式环境模板
 
 执行前先确认：

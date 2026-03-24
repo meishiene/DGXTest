@@ -4,7 +4,7 @@
   "trigger_by": "local_user",
   "base_url": "https://dgx.xlook.ai",
   "browser": "chromium",
-  "headless": true,
+  "headless": false,
   "dry_run": false,
   "demo_failure": false,
   "output_root": "outputs",

@@ -973,6 +973,71 @@ def test_live_runner_collects_configured_failure_evidence(tmp_path: Path) -> Non
     assert all(Path(artifact.file_path).exists() for artifact in artifacts)
 
 
+def test_live_runner_opens_headed_chromium_maximized(tmp_path: Path) -> None:
+    config = AppConfig(
+        project_name="DGX Web Auto Test",
+        suite_name="dgx_demo_suite",
+        trigger_by="tester",
+        base_url="https://dgx.xlook.ai",
+        browser="chromium",
+        headless=False,
+        dry_run=False,
+        output_root=str(tmp_path / "outputs"),
+    )
+    run_context = prepare_run_context(config)
+    suite = ParsedTestSuite(
+        cases=[],
+        steps=[],
+        test_data=[],
+        run_config_rows=[],
+        dictionaries=[],
+    )
+    repository = ParsedObjectRepository(pages=[], objects=[])
+    fake_playwright = _FakePlaywrightContext()
+
+    with patch("playwright.sync_api.sync_playwright", return_value=fake_playwright):
+        execute_run(config, run_context, suite, repository)
+
+    chromium = fake_playwright.playwright.chromium
+    assert chromium.launch_calls == [{"headless": False, "args": ["--start-maximized"]}]
+    assert chromium.last_browser is not None
+    assert chromium.last_browser.new_page_calls == [{"no_viewport": True}]
+    assert len(chromium.last_browser._page.evaluate_calls) == 1
+    assert "window.resizeTo(window.screen.availWidth, window.screen.availHeight)" in chromium.last_browser._page.evaluate_calls[0]
+
+
+def test_live_runner_skips_maximize_options_in_headless_mode(tmp_path: Path) -> None:
+    config = AppConfig(
+        project_name="DGX Web Auto Test",
+        suite_name="dgx_demo_suite",
+        trigger_by="tester",
+        base_url="https://dgx.xlook.ai",
+        browser="chromium",
+        headless=True,
+        dry_run=False,
+        output_root=str(tmp_path / "outputs"),
+    )
+    run_context = prepare_run_context(config)
+    suite = ParsedTestSuite(
+        cases=[],
+        steps=[],
+        test_data=[],
+        run_config_rows=[],
+        dictionaries=[],
+    )
+    repository = ParsedObjectRepository(pages=[], objects=[])
+    fake_playwright = _FakePlaywrightContext()
+
+    with patch("playwright.sync_api.sync_playwright", return_value=fake_playwright):
+        execute_run(config, run_context, suite, repository)
+
+    chromium = fake_playwright.playwright.chromium
+    assert chromium.launch_calls == [{"headless": True}]
+    assert chromium.last_browser is not None
+    assert chromium.last_browser.new_page_calls == [{}]
+    assert chromium.last_browser._page.evaluate_calls == []
+
+
 def _build_case(
     case_id: str,
     tags: list[str],
@@ -1010,8 +1075,10 @@ def _build_case(
 class _FakeBrowser:
     def __init__(self) -> None:
         self._page = _FakePage()
+        self.new_page_calls: list[dict[str, object]] = []
 
-    def new_page(self):
+    def new_page(self, **kwargs):
+        self.new_page_calls.append(dict(kwargs))
         return self._page
 
     def close(self) -> None:
@@ -1019,8 +1086,14 @@ class _FakeBrowser:
 
 
 class _FakeBrowserType:
-    def launch(self, headless: bool):
-        return _FakeBrowser()
+    def __init__(self) -> None:
+        self.launch_calls: list[dict[str, object]] = []
+        self.last_browser: _FakeBrowser | None = None
+
+    def launch(self, **kwargs):
+        self.launch_calls.append(dict(kwargs))
+        self.last_browser = _FakeBrowser()
+        return self.last_browser
 
 
 class _FakePlaywright:
@@ -1031,8 +1104,11 @@ class _FakePlaywright:
 
 
 class _FakePlaywrightContext:
+    def __init__(self) -> None:
+        self.playwright = _FakePlaywright()
+
     def __enter__(self) -> _FakePlaywright:
-        return _FakePlaywright()
+        return self.playwright
 
     def __exit__(self, exc_type, exc, tb) -> bool:
         return False
@@ -1042,6 +1118,7 @@ class _FakePage:
     def __init__(self) -> None:
         self.url = "https://dgx.xlook.ai/dgx/demo"
         self._handlers: dict[str, list] = {}
+        self.evaluate_calls: list[str] = []
 
     def on(self, event_name: str, handler) -> None:
         self._handlers.setdefault(event_name, []).append(handler)
@@ -1076,6 +1153,10 @@ class _FakePage:
 
     def content(self) -> str:
         return "<html><body>live failure</body></html>"
+
+    def evaluate(self, expression: str):
+        self.evaluate_calls.append(expression)
+        return None
 
 
 
