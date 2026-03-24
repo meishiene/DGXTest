@@ -28,7 +28,8 @@ REQUIRED_OBJECT_SHEETS = ["Page_Index", "Element_Objects"]
 
 def parse_test_workbook(workbook_path: Path) -> ParsedTestSuite:
     workbook = _load_workbook(workbook_path)
-    _validate_required_sheets(workbook.sheetnames, REQUIRED_TEST_SHEETS, workbook_path)
+    sheet_map = _build_sheet_map(workbook.sheetnames)
+    _validate_required_sheets(sheet_map, REQUIRED_TEST_SHEETS, workbook_path)
 
     cases = [
         CaseRecord(
@@ -49,9 +50,12 @@ def parse_test_workbook(workbook_path: Path) -> ParsedTestSuite:
             env_scope=_split_csv(row["env_scope"]),
             browser_scope=_split_csv(row["browser_scope"]),
             can_parallel=row["can_parallel"],
+            retry_policy=row.get("retry_policy", ""),
+            require_login=row.get("require_login", ""),
+            depends_on_case=row.get("depends_on_case", ""),
             raw=row,
         )
-        for row in _sheet_to_dicts(workbook["Case_Index"])
+        for row in _sheet_to_dicts(workbook[sheet_map["Case_Index"]])
     ]
 
     steps = [
@@ -78,11 +82,11 @@ def parse_test_workbook(workbook_path: Path) -> ParsedTestSuite:
             remark=row["remark"],
             raw=row,
         )
-        for row in _sheet_to_dicts(workbook["Case_Steps"])
+        for row in _sheet_to_dicts(workbook[sheet_map["Case_Steps"]])
     ]
 
     test_data = []
-    for row in _sheet_to_dicts(workbook["Test_Data"]):
+    for row in _sheet_to_dicts(workbook[sheet_map["Test_Data"]]):
         payload = {
             key: value
             for key, value in row.items()
@@ -99,7 +103,7 @@ def parse_test_workbook(workbook_path: Path) -> ParsedTestSuite:
             )
         )
 
-    run_config_rows = _sheet_to_dicts(workbook["Run_Config"])
+    run_config_rows = _sheet_to_dicts(workbook[sheet_map["Run_Config"]])
     dictionaries = [
         DictionaryRecord(
             dict_type=row["dict_type"],
@@ -108,7 +112,7 @@ def parse_test_workbook(workbook_path: Path) -> ParsedTestSuite:
             enabled=row["enabled"],
             remark=row["remark"],
         )
-        for row in _sheet_to_dicts(workbook["Dictionary"])
+        for row in _sheet_to_dicts(workbook[sheet_map["Dictionary"]])
     ]
 
     return ParsedTestSuite(
@@ -122,7 +126,8 @@ def parse_test_workbook(workbook_path: Path) -> ParsedTestSuite:
 
 def parse_object_repository(workbook_path: Path) -> ParsedObjectRepository:
     workbook = _load_workbook(workbook_path)
-    _validate_required_sheets(workbook.sheetnames, REQUIRED_OBJECT_SHEETS, workbook_path)
+    sheet_map = _build_sheet_map(workbook.sheetnames)
+    _validate_required_sheets(sheet_map, REQUIRED_OBJECT_SHEETS, workbook_path)
 
     pages = [
         PageRecord(
@@ -138,7 +143,7 @@ def parse_object_repository(workbook_path: Path) -> ParsedObjectRepository:
             status=row["status"],
             remark=row["remark"],
         )
-        for row in _sheet_to_dicts(workbook["Page_Index"])
+        for row in _sheet_to_dicts(workbook[sheet_map["Page_Index"]])
     ]
 
     objects = [
@@ -163,7 +168,7 @@ def parse_object_repository(workbook_path: Path) -> ParsedObjectRepository:
             enabled=row["enabled"],
             remark=row["remark"],
         )
-        for row in _sheet_to_dicts(workbook["Element_Objects"])
+        for row in _sheet_to_dicts(workbook[sheet_map["Element_Objects"]])
     ]
 
     return ParsedObjectRepository(pages=pages, objects=objects)
@@ -175,8 +180,17 @@ def _load_workbook(workbook_path: Path):
     return load_workbook(workbook_path)
 
 
-def _validate_required_sheets(sheet_names: list[str], required: list[str], workbook_path: Path) -> None:
-    missing = [name for name in required if name not in sheet_names]
+def _build_sheet_map(sheet_names: list[str]) -> dict[str, str]:
+    sheet_map: dict[str, str] = {}
+    for name in sheet_names:
+        normalized = _normalize_sheet_name(name)
+        if normalized and normalized not in sheet_map:
+            sheet_map[normalized] = name
+    return sheet_map
+
+
+def _validate_required_sheets(sheet_map: dict[str, str], required: list[str], workbook_path: Path) -> None:
+    missing = [name for name in required if name not in sheet_map]
     if missing:
         raise ValueError(f"Excel 缺少工作表 {missing}: {workbook_path}")
 
@@ -185,7 +199,7 @@ def _sheet_to_dicts(sheet) -> list[dict[str, str]]:
     rows = list(sheet.iter_rows(values_only=True))
     if not rows:
         return []
-    headers = [str(item).strip() if item is not None else "" for item in rows[0]]
+    headers = [_normalize_header_name(item) for item in rows[0]]
     data_rows: list[dict[str, str]] = []
     for raw_row in rows[1:]:
         if raw_row is None:
@@ -203,6 +217,30 @@ def _sheet_to_dicts(sheet) -> list[dict[str, str]]:
         if has_value:
             data_rows.append(row)
     return data_rows
+
+
+def _normalize_sheet_name(value) -> str:
+    if value is None:
+        return ""
+    text = str(value).strip()
+    if not text:
+        return ""
+    if " - " in text:
+        return text.split(" - ", 1)[0].strip()
+    return _normalize_header_name(text)
+
+
+def _normalize_header_name(value) -> str:
+    if value is None:
+        return ""
+    text = str(value).strip().replace("\r\n", "\n")
+    if not text:
+        return ""
+    first_line = text.split("\n", 1)[0].strip()
+    for marker in ("（", "("):
+        if marker in first_line:
+            first_line = first_line.split(marker, 1)[0].strip()
+    return first_line
 
 
 def _split_csv(value: str) -> list[str]:

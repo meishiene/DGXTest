@@ -1,0 +1,72 @@
+﻿{
+  "project_name": "DGX Web Auto Test Framework",
+  "workspace": "D:\\work\\xkool\\DGXTest",
+  "docs_root": "D:\\work\\xkool\\DGXTest\\docs",
+  "plan_doc": "D:\\work\\xkool\\DGXTest\\docs\\development-plan.md",
+  "handoff_doc": "D:\\work\\xkool\\DGXTest\\docs\\status\\handoff.md",
+  "handoff_json": "D:\\work\\xkool\\DGXTest\\docs\\status\\handoff.json",
+  "guidelines_doc": "D:\\work\\xkool\\DGXTest\\docs\\guides\\development-guidelines.md",
+  "architecture_doc": "D:\\work\\xkool\\DGXTest\\docs\\architecture.md",
+  "current_stage": "P2-1 done: formal run config / execution-entry safety hardened",
+  "current_focus": {
+    "phase": "P2",
+    "task": "P2-1 formal run config / execution-entry safety hardening",
+    "next_steps": [
+      "Run one controlled live/prod smoke with explicit config files",
+      "Decide the next phase label and keep docs aligned"
+    ]
+  },
+  "default_demo": {
+    "name": "DGX demo",
+    "base_url": "https://dgx.xlook.ai",
+    "route": "/dgx/f2b850f5-14a0-4325-b56d-cb1213f63ec2",
+    "full_url": "https://dgx.xlook.ai/dgx/f2b850f5-14a0-4325-b56d-cb1213f63ec2"
+  },
+  "tech_stack": {
+    "language": "Python 3.10",
+    "automation": "Playwright",
+    "excel": "openpyxl",
+    "tests": "pytest"
+  },
+  "latest_verified_commands": [
+    "python -m pytest -q tests/test_config_loader.py",
+    "python -m pytest -q tests/test_main.py",
+    "python -m pytest -q"
+  ],
+  "latest_verified_summary": {
+    "pytest": "56 passed (full suite after P2-1 execution-entry safety closure)"
+  },
+  "key_files": {
+    "config_loader": "src/parser/config_loader.py",
+    "config_validator": "src/validator/config_validator.py",
+    "entrypoint": "src/main.py",
+    "report_generator": "src/reports/report_generator.py",
+    "assert_executor": "src/asserts/executor.py",
+    "template_generator": "src/parser/template_generator.py",
+    "config_tests": "tests/test_config_loader.py",
+    "main_tests": "tests/test_main.py",
+    "execution_tests": "tests/test_execution_support.py",
+    "report_tests": "tests/test_ai_bug_handoff_output.py"
+  },
+  "latest_key_changes": [
+    "Completed P1-3 report/output enhancements with richer Excel outputs and stats sheets",
+    "Added config-loader guardrails for unknown fields, non-object top-level JSON, and explicit live workbook/object paths",
+    "Extended config-validator guardrails for origin-only base_url, live demo_failure blocking, output_root file blocking, and path type checks",
+    "Added user-friendly CLI entrypoint error handling with non-zero exit code",
+    "Verified the full suite after the new execution-entry safety checks"
+  ],
+  "next_priorities": [
+    "Run one controlled live/prod smoke with explicit configuration",
+    "Decide the next phase scope after P2-1 closure"
+  ],
+  "resume_steps": [
+    "Review docs/development-plan.md",
+    "Review docs/status/handoff.md",
+    "Review docs/guides/development-guidelines.md",
+    "Start from src/parser/config_loader.py, src/validator/config_validator.py, and src/main.py"
+  ],
+  "encoding_policy": {
+    "markdown": "utf-8-sig",
+    "handoff_json": "utf-8-sig"
+  }
+}

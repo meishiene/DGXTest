@@ -1,6 +1,6 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
-from playwright.sync_api import Locator, Page, TimeoutError as PlaywrightTimeoutError
+from playwright.sync_api import Locator, Page
 
 from src.objects.resolver import LocatorCandidate, ObjectRepositoryResolver, ResolvedObject
 
@@ -10,12 +10,14 @@ def resolve_locator(
     resolver: ObjectRepositoryResolver,
     object_key: str,
     timeout_ms: int,
+    wait_for_attached: bool = True,
 ) -> tuple[Locator, ResolvedObject]:
     last_error: Exception | None = None
     for candidate in resolver.get_locator_candidates(object_key):
         try:
             locator = _build_locator(page, candidate)
-            locator.wait_for(state="attached", timeout=timeout_ms)
+            if wait_for_attached:
+                locator.wait_for(state="attached", timeout=timeout_ms)
             resolved = resolver.build_resolved_object(
                 object_key=object_key,
                 locator_type=candidate.locator_type,
@@ -28,7 +30,7 @@ def resolve_locator(
 
     if last_error is not None:
         raise last_error
-    raise ValueError(f"对象没有可用定位器: {object_key}")
+    raise ValueError(f"Object has no usable locator candidates: {object_key}")
 
 
 def _build_locator(page: Page, candidate: LocatorCandidate) -> Locator:
@@ -50,4 +52,4 @@ def _build_locator(page: Page, candidate: LocatorCandidate) -> Locator:
     if locator_type == "partial_text":
         return page.get_by_text(locator_value)
 
-    raise ValueError(f"暂不支持的定位方式: {candidate.locator_type}")
+    raise ValueError(f"Unsupported locator type: {candidate.locator_type}")

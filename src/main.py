@@ -1,6 +1,7 @@
 ﻿from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
 from src.core.app import run_application
@@ -24,7 +25,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
 def main() -> int:
     args = build_arg_parser().parse_args()
-    return run_application(config_path=args.config, force_dry_run=args.dry_run)
+    try:
+        return run_application(config_path=args.config, force_dry_run=args.dry_run)
+    except (FileNotFoundError, ValueError) as exc:
+        print(f"运行失败: {exc}", file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":

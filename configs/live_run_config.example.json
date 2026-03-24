@@ -16,5 +16,7 @@
   "generate_bug_report": true,
   "generate_ai_bug_doc": true,
   "timeout_ms": 10000,
-  "run_id": ""
+  "run_id": "",
+  "test_workbook_path": "excels/test_suite_template.xlsx",
+  "object_repository_path": "object_repo/object_repository_template.xlsx"
 }

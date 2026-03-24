@@ -1,12 +1,12 @@
 ﻿{
   "project_name": "DGX Web Auto Test",
-  "suite_name": "dgx_demo_dry_run",
+  "suite_name": "dgx_prod_live_smoke",
   "trigger_by": "local_user",
-  "base_url": "https://dgx.xlook.ai",
+  "base_url": "https://your-prod-host.example.com",
   "browser": "chromium",
   "headless": true,
-  "dry_run": true,
-  "demo_failure": true,
+  "dry_run": false,
+  "demo_failure": false,
   "output_root": "outputs",
   "capture_screenshot": true,
   "capture_dom_snapshot": true,
@@ -16,5 +16,7 @@
   "generate_bug_report": true,
   "generate_ai_bug_doc": true,
   "timeout_ms": 10000,
-  "run_id": ""
+  "run_id": "",
+  "test_workbook_path": "excels/test_suite_template.xlsx",
+  "object_repository_path": "object_repo/object_repository_template.xlsx"
 }

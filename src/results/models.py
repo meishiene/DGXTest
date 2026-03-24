@@ -94,6 +94,7 @@ class StepResult:
     component_hint: str = ""
     frontend_file_hint: str = ""
     api_hint: str = ""
+    attempt_no: int = 1
 
 
 @dataclass(slots=True)
@@ -117,6 +118,8 @@ class CaseResult:
     artifact_ids: list[str] = field(default_factory=list)
     suspected_layer: str = ""
     bug_id: str = ""
+    retry_count: int = 0
+    blocked_by_case_id: str = ""
 
 
 @dataclass(slots=True)

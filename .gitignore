@@ -1,4 +1,4 @@
-.pytest_cache/
+﻿.pytest_cache/
 __pycache__/
 *.py[cod]
 *.pyo
@@ -15,6 +15,8 @@ outputs/*
 !outputs/ai-bug-handoff/**
 
 outputs/recordings/
+
+~$*.xlsx
 
 .DS_Store
 Thumbs.db

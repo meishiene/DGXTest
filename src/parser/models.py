@@ -22,6 +22,9 @@ class CaseRecord:
     env_scope: list[str]
     browser_scope: list[str]
     can_parallel: str
+    retry_policy: str = ""
+    require_login: str = ""
+    depends_on_case: str = ""
     raw: dict[str, str] = field(default_factory=dict)
 
 
